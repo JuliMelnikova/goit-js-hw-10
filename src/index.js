@@ -1,32 +1,36 @@
 import './css/styles.css';
 
-
 import { fetchCountries } from './fetchCountries';
-import Notiflix from 'notiflix';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+// import Notiflix from 'notiflix';
 import debounce from 'lodash.debounce';
+
 
 const DEBOUNCE_DELAY = 300;
 
 const input = document.querySelector('#search-box');
 const countryList = document.querySelector('.country-list');
-const countryInformation = document.querySelector('.country-info');
+const countryInfo = document.querySelector('.country-info');
+
+
 
 input.addEventListener('input', debounce(e => {
-    const countryValue = input.value.country();
+    const countValue = input.value.trim();
 
     cleanHtml();
 
-    if (countryValue !== '') {
-        fetchCountries(countryValue).then(result => {
+    if (countValue !== '') {
+        fetchCountries(countValue).then(result => {
         if (result.length > 10) {
             Notiflix.Notify.info(
-            'Too many matches found. Please enter a more specific name. 🤓');
+            'Too many matches found. Please enter a more specific name. 🤓'
+            );
         } else if (result.length === 0) {
             Notiflix.Notify.failure('Oops, there is no country with that name 🤔');
         } else if (result.length >= 2 && result.length <= 10) {
             renderCountryList(result);
         } else if (result.length === 1) {
-            rendercountryInformation(result);
+            renderCountryInfo(result);
         }
     });
     }
@@ -45,7 +49,7 @@ function renderCountryList(country) {
     countryList.innerHTML = markup;
 }
 
-function rendercountryInformation(countries) {
+function renderCountryInfo(countries) {
     const markup = countries
     .map(country => {
         return `<img src="${country.flags.svg}" alt="Flag of ${
@@ -59,10 +63,10 @@ function rendercountryInformation(countries) {
         <p>Languages: <b>${Object.values(country.languages)}</b> </p>`;
     })
     .join('');
-    countryInformation.innerHTML = markup;
+    countryInfo.innerHTML = markup;
 }
 
 function cleanHtml() {
     countryList.innerHTML = '';
-    countryInformation.innerHTML = '';
+    countryInfo.innerHTML = '';
 }
